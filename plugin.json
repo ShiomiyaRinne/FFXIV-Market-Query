@@ -1,0 +1,12 @@
+{
+  "ID":"b0b19e68-7785-4b0a-b0e4-db36ca98b335",
+  "ActionKeyword":"item",
+  "Name":"FF14市价查询",
+  "Description":"提供FF14市场价格，数据来自universalis.app",
+  "Author":"ShiomiyaRinne",
+  "Version":"1.0.0",
+  "Language":"python",
+  "Website":"",
+  "IcoPath":"Images\\ff.ico",
+  "ExecuteFileName":"main.py"
+}
