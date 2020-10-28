@@ -9,12 +9,6 @@ class Main(Wox):
         key=key.split(' ')
         servers={
             '1':"LuXingNiao",'2':"MoGuLi",'3':"MaoXiaoPang",
-            # 'hyh':"HongYuHai",'lnxy':"LaNuoXiYa",'cxwz':"ChenXiWangZuo",'yzhy':"YuZhouHeYin",
-            # 'wxxr':"WoXianXiRan",'syzd':"ShenYiZhiDi",'hyqd':"HuanYingQunDao",'myc':"MengYaChi",
-            # 'byx':"BaiYinXiang",'bjhx':"BaiJinHuanXiang",'sqh':"ShenQuanHen",'cft':"ChaoFengTing",
-            # 'lrzq':"LvRenZhanQiao",'fxzj':"FuXiaoZhiJian",'lcsd':"Longchaoshendian",'mybj':"MengYuBaoJing",
-            # 'zszq':"ZiShuiZhanQiao",'yx':"YanXia",'jyzy':"JingYuZhuangYuan",'mdn':"MoDuNa",
-            # 'hmcw':"HaiMaoChaWu",'rfhw':"RouFengHaiWan",'hpy':"HuPoYuan"
         }
         worlds={
             'HongYuHai':"红玉海",
@@ -44,22 +38,22 @@ class Main(Wox):
             'HuPoYuan':"琥珀原"
         }
         if key[0]=='s':
-            c1='https://cafemaker.wakingsands.com/search?columns=ID%2CUrlType%2CIcon%2CName%2CItemKind.Name&string={}'.format(key[1])
-            items=json.loads(requests.get(c1).text)["Results"]
-            for item in items:
-                if item["UrlType"]=="Item":
-                    itemID=item["ID"]
-                    itemIcon='https://cafemaker.wakingsands.com/{}'.format(item["Icon"])
+            recvListings=self.cafemaker(key[1])
+            for item in recvListings:
+                itemID,itemType,itemIconPath,itemKindName,itemName=self.itemSolve(item)
+                if itemType=="Item":
+                    itemIconUrl='https://cafemaker.wakingsands.com/{}'.format(itemIconPath)
                     if not os.path.exists('ItemIcon/{}.png'.format(itemID)):
                         with open('ItemIcon/{}.png'.format(itemID),'wb') as f:
-                            f.write(requests.get(itemIcon).content)
+                            f.write(requests.get(itemIconUrl).content)
+
                     results.append({
-                        "Title":"{}".format(item["Name"]),
-                        "SubTitle":"{}".format(item["ItemKind"]["Name"]),
+                        "Title":"{}".format(itemName),
+                        "SubTitle":"{}".format(itemKindName),
                         "IcoPath":"ItemIcon/{}.png".format(itemID),
                         "JsonRPCAction":{
                             "method":"Wox.ChangeQuery",
-                            "parameters":["item q {} 1".format(item["Name"]),False],
+                            "parameters":["item q {} 1 ({})".format(itemID,itemName),False],
                             "dontHideAfterAction":True
                         }
                     })
@@ -74,14 +68,20 @@ class Main(Wox):
                 })
             return results
 
-    def universalis(self,server,itemName):
-        c='https://cafemaker.wakingsands.com/search?string={}'.format(itemName)
-        itemID=json.loads(requests.get(c).text)["Results"][0]["ID"]
+    def universalis(self,server,itemID):
         api='https://universalis.app/api/{}/{}'.format(server,itemID)
         recv=requests.get(api)
         if recv.text=='Not Found':
             return False
         return json.loads(recv.text)["listings"]
+
+    def cafemaker(self,queryName):
+        u='https://cafemaker.wakingsands.com/search?columns=ID%2CUrlType%2CIcon%2CName%2CItemKind.Name&string={}'.format(queryName)
+        return json.loads(requests.get(u).text)["Results"]
+
+    def itemSolve(self,item):
+        return item["ID"],item["UrlType"],item["Icon"],item["ItemKind"]["Name"],item["Name"]
+
 
 
 if __name__ == "__main__":
