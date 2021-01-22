@@ -9,4 +9,4 @@
 可由搜索道具结果直接点击跳转到市价查询
 ## 数据来源
 * [Universalis.app](https://universalis.app/)
-* [cafemaker](https://cafemaker.wakingsands.com)
+* [cafemaker.wakingsands.com](https://cafemaker.wakingsands.com)
